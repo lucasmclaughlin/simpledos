@@ -11,8 +11,7 @@ function App() {
   const [currentTodoIndex, setCurrentTodoIndex] = useState(null); // Track index of current random to-do
   const [view, setView] = useState('random'); // Default view is random
   const [isDarkMode, setIsDarkMode] = useState(false); // Light or Dark mode
-  const [timeLeft, setTimeLeft] = useState(1500); // Pomodoro timer (25 min)
-  const [isTimerRunning, setIsTimerRunning] = useState(false); // Track if timer is running
+  const [returnTime, setReturnTime] = useState(2); // Default return time (2 days)
 
   function persistData(newList, futureList) {
     localStorage.setItem('todos', JSON.stringify({ todos: newList, futureTodos: futureList }));
@@ -25,9 +24,7 @@ function App() {
   }
 
   function handleDeleteTodo(index) {
-    const newTodoList = todos.filter((todo, todoIndex) => {
-      return todoIndex !== index;
-    });
+    const newTodoList = todos.filter((todo, todoIndex) => todoIndex !== index);
     persistData(newTodoList, futureTodos);
     setTodos(newTodoList);
     if (newTodoList.length > 0) {
@@ -37,10 +34,14 @@ function App() {
     }
   }
 
-  // Mark a todo as "done" and move to future todos list
-  function handleDoneTodo(index) {
+  // Mark a todo as "done" and move to future todos list with custom return time
+  function handleDoneTodo(index, customReturnTime) {
     const todoToMove = todos[index];
-    const newFutureTodos = [...futureTodos, { todo: todoToMove, doneDate: new Date() }];
+    const newFutureTodos = [...futureTodos, { 
+      todo: todoToMove, 
+      doneDate: new Date(), 
+      returnInDays: customReturnTime || returnTime // Use custom return time or default
+    }];
     const newTodoList = todos.filter((_, todoIndex) => todoIndex !== index);
     persistData(newTodoList, newFutureTodos);
     setTodos(newTodoList);
@@ -54,13 +55,19 @@ function App() {
     }
   }
 
-  // Move back any todos that were done over 2 days ago
+  // Move back any todos that are ready based on custom return time
   function moveFutureTodosBack() {
-    const twoDaysInMillis = 2 * 24 * 60 * 60 * 1000;
     const now = new Date();
 
-    const readyTodos = futureTodos.filter((item) => now - new Date(item.doneDate) > twoDaysInMillis);
-    const remainingFutureTodos = futureTodos.filter((item) => now - new Date(item.doneDate) <= twoDaysInMillis);
+    const readyTodos = futureTodos.filter((item) => {
+      const returnTimeInMillis = item.returnInDays * 24 * 60 * 60 * 1000;
+      return now - new Date(item.doneDate) > returnTimeInMillis;
+    });
+
+    const remainingFutureTodos = futureTodos.filter((item) => {
+      const returnTimeInMillis = item.returnInDays * 24 * 60 * 60 * 1000;
+      return now - new Date(item.doneDate) <= returnTimeInMillis;
+    });
 
     if (readyTodos.length > 0) {
       const newTodoList = [...todos, ...readyTodos.map((item) => item.todo)];
@@ -101,37 +108,13 @@ function App() {
       getRandomTodo(parsed.todos);
     }
 
-    // Pomodoro timer logic
-    const timer = setInterval(() => {
-      if (isTimerRunning && timeLeft > 0) {
-        setTimeLeft((prevTime) => prevTime - 1);
-      }
-    }, 1000);
-
     // Check future todos every time the app loads
     moveFutureTodosBack();
-
-    return () => clearInterval(timer); // Cleanup the interval on component unmount
-  }, [isTimerRunning, timeLeft]);
-
-  // Convert seconds to mm:ss for timer display
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
-  };
-
-  // Start, Pause, and Reset functionality
-  const startTimer = () => setIsTimerRunning(true);
-  const pauseTimer = () => setIsTimerRunning(false);
-  const resetTimer = () => {
-    setIsTimerRunning(false);
-    setTimeLeft(1500); // Reset to 25 minutes
-  };
+  }, []);
 
   // Toggle between views with a sliding animation
-  const toggleView = () => {
-    setView((prevView) => (prevView === 'random' ? 'list' : 'random'));
+  const toggleView = (newView) => {
+    setView(newView);
   };
 
   return (
@@ -143,8 +126,14 @@ function App() {
           setTodoValue={setTodoValue}
           handleAddTodos={handleAddTodos}
         />
-        <span className="view-toggle-icon" onClick={toggleView}>
-          {view === 'random' ? '✏️' : '🔄'}
+        <span className="view-toggle-icon" onClick={() => toggleView('list')}>
+          ✏️ {/* Edit/View All Todos */}
+        </span>
+        <span className="view-toggle-icon" onClick={() => toggleView('random')}>
+          🔄 {/* Random Todos */}
+        </span>
+        <span className="view-toggle-icon" onClick={() => toggleView('future')}>
+          🕒 {/* Future Todos */}
         </span>
       </div>
 
@@ -155,7 +144,8 @@ function App() {
             handleEditTodo={handleEditTodo}
             handleDeleteTodo={handleDeleteTodo}
             todos={todos}
-            handleDoneTodo={handleDoneTodo} // Add the done button to each todo
+            handleDoneTodo={handleDoneTodo}
+            setReturnTime={setReturnTime} // Pass the return time setter
           />
         )}
       </div>
@@ -164,9 +154,9 @@ function App() {
       {view === 'random' && (
         <div className="random-todo-container slide-in">
           <div className="todo-card">
-            {currentTodo ? <p>{currentTodo}</p> : <p>unBusy</p>}
+            {currentTodo ? <p>{currentTodo}</p> : <p>No to-dos available</p>}
           </div>
-          <button onClick={() => handleDoneTodo(currentTodoIndex)} className="done-button">
+          <button onClick={() => handleDoneTodo(currentTodoIndex, returnTime)} className="done-button">
             Done
           </button>
           <button onClick={() => getRandomTodo(todos)} className="random-button">
@@ -175,16 +165,24 @@ function App() {
         </div>
       )}
 
-      {/* Pomodoro Timer */}
-      {/* <div className="pomodoro-timer">
-        <h3>Pomodoro Timer</h3>
-        <p>{formatTime(timeLeft)}</p>
-        <div className="timer-controls">
-          <button onClick={startTimer} className="timer-button">Start</button>
-          <button onClick={pauseTimer} className="timer-button">Pause</button>
-          <button onClick={resetTimer} className="timer-button">Reset</button>
+      {/* Future To-Do View */}
+      {view === 'future' && (
+        <div className="future-todo-container slide-in">
+          <h3>Future To-Dos</h3>
+          <ul>
+            {futureTodos.length > 0 ? (
+              futureTodos.map((item, index) => (
+                <li key={index}>
+                  {item.todo}
+                  <small>(Return in {item.returnInDays} days)</small>
+                </li>
+              ))
+            ) : (
+              <p>No future to-dos available.</p>
+            )}
+          </ul>
         </div>
-      </div> */}
+      )}
     </div>
   );
 }
