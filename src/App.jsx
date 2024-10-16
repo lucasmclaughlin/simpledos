@@ -161,7 +161,7 @@ function App() {
       {view === 'random' && (
         <div className="random-todo-container slide-in">
           <div className="todo-card">
-            {currentTodo ? <p>{currentTodo}</p> : <p>No to-dos available</p>}
+            {currentTodo ? <p>{currentTodo}</p> : <p>unBusy</p>}
           </div>
           <button onClick={() => handleDoneTodo(currentTodoIndex, returnTime)} className="done-button">
             Done
