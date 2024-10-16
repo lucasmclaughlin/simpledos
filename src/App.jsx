@@ -55,6 +55,13 @@ function App() {
     }
   }
 
+  // Handle deleting a future to-do
+  function handleDeleteFutureTodo(index) {
+    const newFutureTodos = futureTodos.filter((_, todoIndex) => todoIndex !== index);
+    setFutureTodos(newFutureTodos);
+    persistData(todos, newFutureTodos); // Persist the change to localStorage
+  }
+
   // Move back any todos that are ready based on custom return time
   function moveFutureTodosBack() {
     const now = new Date();
@@ -175,6 +182,10 @@ function App() {
                 <li key={index}>
                   {item.todo}
                   <small>(Return in {item.returnInDays} days)</small>
+                  {/* Delete Button for Future To-Dos */}
+                  <button onClick={() => handleDeleteFutureTodo(index)} className="delete-button">
+                    Delete
+                  </button>
                 </li>
               ))
             ) : (
