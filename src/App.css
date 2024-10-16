@@ -1,0 +1,116 @@
+/* Light/Dark Mode */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .app-container.light {
+    background-color: #f9f9f9;
+    color: #333;
+  }
+  
+  .app-container.dark {
+    background-color: #1e1e1e;
+    color: #f9f9f9;
+  }
+  
+  /* Header with input and view toggle */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+  }
+  
+  /* Icon to toggle between views */
+  .view-toggle-icon {
+    cursor: pointer;
+    font-size: 1.5rem;
+  }
+  
+  /* Todo Card */
+  .todo-card {
+    width: 300px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: lightgrey;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+  
+  /* Button to show another random todo */
+  .random-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .random-button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Pomodoro Timer */
+  .pomodoro-timer {
+    text-align: center;
+    padding: 20px 0;
+    font-size: 1.2rem;
+    background-color: rgba(171, 171, 171, 0.667);
+    border-radius: 10px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .timer-controls {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .timer-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .timer-button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Animations */
+  .content-container {
+    transition: transform 0.5s ease;
+  }
+  
+  .slide-in {
+    transform: translateX(0);
+  }
+  
+  .slide-out {
+    transform: translateX(-100%);
+  }
+  
+  .random-todo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
