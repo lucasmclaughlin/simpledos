@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
-import TodoCard from "./components/TodoCard"
-import TodoInput from "./components/Todoinput"
-import TodoList from "./components/TodoList"
+import TodoCard from "./components/TodoCard.jsx"
+import TodoInput from "./components/Todoinput.jsx"
+import TodoList from "./components/TodoList.jsx"
 function App() { 
   const [todos, setTodos] = useState([])
   const [todoValue, setTodoValue] = useState('')
