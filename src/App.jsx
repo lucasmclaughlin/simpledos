@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import TodoInput from "./components/TodoInput";
 import TodoList from "./components/TodoList";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faClock, faTrashAlt, faNoteSticky } from '@fortawesome/free-solid-svg-icons'; // Import icons
 import './App.css'; // Importing styles
 
 function App() {
@@ -133,15 +135,16 @@ function App() {
           setTodoValue={setTodoValue}
           handleAddTodos={handleAddTodos}
         />
-        <span className="view-toggle-icon" onClick={() => toggleView('list')}>
-          ✏️ {/* Edit/View All Todos */}
-        </span>
-        <span className="view-toggle-icon" onClick={() => toggleView('random')}>
-          🔄 {/* Random Todos */}
-        </span>
-        <span className="view-toggle-icon" onClick={() => toggleView('future')}>
-          🕒 {/* Future Todos */}
-        </span>
+        <button className="view-toggle-icon" onClick={() => toggleView('list')}>
+          <FontAwesomeIcon icon={faEdit} /> {/* Edit/View All Todos */}
+        </button>
+        <button className="view-toggle-icon" onClick={() => toggleView('random')}>
+          <FontAwesomeIcon icon={faNoteSticky} /> {/* Random Todos */}
+        </button>
+        <button className="view-toggle-icon" onClick={() => toggleView('future')}>
+          <FontAwesomeIcon icon={faClock} /> {/* Future Todos */}
+        </button>
+        
       </div>
 
       {/* To-Do List View (Edit Mode) */}
@@ -180,11 +183,11 @@ function App() {
             {futureTodos.length > 0 ? (
               futureTodos.map((item, index) => (
                 <li key={index}>
-                  {item.todo}
+                  <p>{item.todo}</p>
                   <small>(Return in {item.returnInDays} days)</small>
                   {/* Delete Button for Future To-Dos */}
                   <button onClick={() => handleDeleteFutureTodo(index)} className="delete-button">
-                    Delete
+                    <FontAwesomeIcon icon={faTrashAlt} /> Delete
                   </button>
                 </li>
               ))
